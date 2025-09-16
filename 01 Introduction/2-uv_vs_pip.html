@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UV vs PIP: Modern Python Package Management</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1in;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            font-size: 11pt;
+            margin: 0;
+            padding: 20px;
+            max-width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2563eb;
+            margin: 0;
+            font-size: 24pt;
+            font-weight: bold;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 12pt;
+            margin-top: 5px;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        h2 {
+            color: #2563eb;
+            font-size: 14pt;
+            margin: 25px 0 15px 0;
+            border-left: 4px solid #2563eb;
+            padding-left: 12px;
+        }
+        
+        h3 {
+            color: #1e40af;
+            font-size: 12pt;
+            margin: 20px 0 12px 0;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 10pt;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px 8px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background-color: #2563eb;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+        
+        .command {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .highlight {
+            background-color: #fef3c7;
+            padding: 15px;
+            border-left: 4px solid #f59e0b;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .advantages {
+            background-color: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .advantages h4 {
+            color: #065f46;
+            margin: 0 0 8px 0;
+            font-size: 11pt;
+        }
+        
+        .two-column {
+            display: flex;
+            gap: 25px;
+            margin: 20px 0;
+        }
+        
+        .column {
+            flex: 1;
+        }
+        
+        ul {
+            margin: 12px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 6px 0;
+        }
+        
+        p {
+            margin: 12px 0;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0.5in;
+            right: 0.75in;
+            font-size: 9pt;
+            color: #666;
+        }
+        
+        .step-number {
+            background-color: #2563eb;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9pt;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page 1 -->
+    <div class="header">
+        <h1>UV vs PIP</h1>
+        <div class="subtitle">Modern Python Package Management</div>
+    </div>
+
+    <h2>What is UV?</h2>
+    <p><strong>UV</strong> is a modern, ultra-fast Python package installer and resolver written in Rust. It's designed as a drop-in replacement for pip and pip-tools, offering significantly better performance and additional features for Python project management.</p>
+
+    <div class="advantages">
+        <h4>🚀 Key Advantages of UV over PIP</h4>
+        <ul>
+            <li><strong>10-100x faster</strong> package installation and dependency resolution</li>
+            <li><strong>Built-in virtual environment management</strong> - no need for separate venv commands</li>
+            <li><strong>Lockfiles by default</strong> - ensures reproducible builds across environments</li>
+            <li><strong>Better dependency resolution</strong> - handles complex dependency conflicts more intelligently</li>
+            <li><strong>Cross-platform consistency</strong> - same behavior on Windows, macOS, and Linux</li>
+            <li><strong>Memory efficient</strong> - lower memory usage during operations</li>
+        </ul>
+    </div>
+
+    <h2>Installation Comparison</h2>
+    
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Tool</th>
+                <th>Installation Method</th>
+                <th>Time to Install</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>PIP</strong></td>
+                <td>Comes with Python (pre-installed)</td>
+                <td>0 seconds</td>
+            </tr>
+            <tr>
+                <td><strong>UV</strong></td>
+                <td>Multiple installation options</td>
+                <td>~30 seconds</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Installing UV</h3>
+    <div class="code-block">
+<span class="command"># Method 1: Using pip</span>
+pip install uv
+
+<span class="command"># Method 2: Using curl (Unix/macOS)</span>
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+<span class="command"># Method 3: Using PowerShell (Windows)</span>
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+<span class="command"># Method 4: Using Homebrew (macOS)</span>
+brew install uv
+    </div>
+
+    <h2>Basic Usage Comparison</h2>
+    
+    <div class="two-column">
+        <div class="column">
+            <h3>PIP Commands</h3>
+            <div class="code-block">
+<span class="command"># Create virtual environment</span>
+python -m venv myenv
+source myenv/bin/activate
+
+<span class="command"># Install packages</span>
+pip install requests numpy
+
+<span class="command"># Generate requirements</span>
+pip freeze > requirements.txt
+
+<span class="command"># Install from requirements</span>
+pip install -r requirements.txt
+            </div>
+        </div>
+        
+        <div class="column">
+            <h3>UV Commands</h3>
+            <div class="code-block">
+<span class="command"># Create project with venv</span>
+uv init myproject
+cd myproject
+
+<span class="command"># Install packages</span>
+uv add requests numpy
+
+<span class="command"># Lockfile auto-generated</span>
+# uv.lock created automatically
+
+<span class="command"># Install from lockfile</span>
+uv sync
+            </div>
+        </div>
+    </div>
+
+    <div class="highlight">
+        <strong>💡 Pro Tip:</strong> UV automatically creates and manages virtual environments, eliminating the need for manual venv commands and activation scripts.
+    </div>
+
+    <!-- Page 2 -->
+    <div class="page-break">
+        <div class="header">
+            <h1>UV Project Management</h1>
+            <div class="subtitle">Advanced Features and Best Practices</div>
+        </div>
+
+        <h2>Project Initialization & Management</h2>
+        
+        <h3><span class="step-number">1</span>Creating a New Project</h3>
+        <div class="code-block">
+<span class="command"># Initialize new project</span>
+uv init my-awesome-project
+cd my-awesome-project
+
+<span class="command"># Project structure created:</span>
+# my-awesome-project/
+# ├── pyproject.toml    # Project configuration
+# ├── uv.lock          # Lockfile (auto-generated)
+# ├── src/
+# │   └── my_awesome_project/
+# │       └── __init__.py
+# └── README.md
+        </div>
+
+        <h3><span class="step-number">2</span>Adding Dependencies</h3>
+        <div class="code-block">
+<span class="command"># Add runtime dependencies</span>
+uv add requests fastapi uvicorn
+
+<span class="command"># Add development dependencies</span>
+uv add --dev pytest black flake8
+
+<span class="command"># Add dependencies with version constraints</span>
+uv add "django>=4.0,<5.0" "numpy>=1.20"
+        </div>
+
+        <h3><span class="step-number">3</span>Environment Management</h3>
+        <div class="code-block">
+<span class="command"># Run commands in project environment</span>
+uv run python main.py
+uv run pytest
+uv run black .
+
+<span class="command"># Install all dependencies</span>
+uv sync
+
+<span class="command"># Install only production dependencies</span>
+uv sync --no-dev
+        </div>
+
+        <h2>Advanced Features</h2>
+        
+        <div class="two-column">
+            <div class="column">
+                <h3>Python Version Management</h3>
+                <div class="code-block">
+<span class="command"># Specify Python version</span>
+uv init --python 3.11
+
+<span class="command"># Use specific Python</span>
+uv run --python 3.9 script.py
+
+<span class="command"># Install Python version</span>
+uv python install 3.12
+                </div>
+            </div>
+            
+            <div class="column">
+                <h3>Dependency Groups</h3>
+                <div class="code-block">
+<span class="command"># Create dependency groups</span>
+uv add --group testing pytest coverage
+uv add --group docs sphinx mkdocs
+
+<span class="command"># Install specific groups</span>
+uv sync --group testing
+uv sync --group docs
+                </div>
+            </div>
+        </div>
+
+        <h2>Migration from PIP to UV</h2>
+        
+        <div class="highlight">
+            <strong>🔄 Easy Migration Steps:</strong>
+            <br>1. Install UV: <code>pip install uv</code>
+            <br>2. Convert existing project: <code>uv init --no-readme</code>
+            <br>3. Import requirements: <code>uv add -r requirements.txt</code>
+            <br>4. Remove old files: Delete <code>requirements.txt</code> and <code>venv/</code>
+        </div>
+
+        <h2>Performance Benchmarks</h2>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Operation</th>
+                    <th>PIP Time</th>
+                    <th>UV Time</th>
+                    <th>Speedup</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Install numpy + pandas</td>
+                    <td>45 seconds</td>
+                    <td>3 seconds</td>
+                    <td>15x faster</td>
+                </tr>
+                <tr>
+                    <td>Resolve complex dependencies</td>
+                    <td>120 seconds</td>
+                    <td>8 seconds</td>
+                    <td>15x faster</td>
+                </tr>
+                <tr>
+                    <td>Create requirements lockfile</td>
+                    <td>30 seconds</td>
+                    <td>2 seconds</td>
+                    <td>15x faster</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Best Practices with UV</h2>
+        
+        <div class="advantages">
+            <h4>✅ Recommended Workflow</h4>
+            <ul>
+                <li>Always use <code>uv init</code> for new projects</li>
+                <li>Commit <code>uv.lock</code> to version control for reproducible builds</li>
+                <li>Use <code>uv sync</code> instead of <code>pip install</code> in CI/CD</li>
+                <li>Leverage dependency groups for different environments</li>
+                <li>Use <code>uv run</code> instead of activating virtual environments manually</li>
+                <li>Regular updates with <code>uv lock --upgrade</code></li>
+            </ul>
+        </div>
+
+        <h2>Common Commands Cheat Sheet</h2>
+        
+        <div class="code-block">
+<span class="command"># Project lifecycle</span>
+uv init myproject              # Initialize new project
+uv add package_name            # Add dependency
+uv remove package_name         # Remove dependency  
+uv sync                        # Install all dependencies
+uv lock                        # Update lockfile
+
+<span class="command"># Running code</span>
+uv run python script.py       # Run Python script
+uv run pytest                 # Run tests
+uv run --with jupyter jupyter lab  # Run with temporary dependency
+
+<span class="command"># Information</span>
+uv tree                       # Show dependency tree
+uv pip list                   # List installed packages
+        </div>
+    </div>
+
+
+</body>
+</html>
