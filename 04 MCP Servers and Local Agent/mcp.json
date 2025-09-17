@@ -1,0 +1,20 @@
+{
+      "mcpServers": {
+          "weather": {
+              "command": "uv",
+              "args": ["run",
+                       "--directory",
+                       "D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\04 MCP Servers and Local Agent\\servers",
+                       "weather_server.py"]
+          },
+
+          "math_server": {
+              "command": "uv",
+              "args": ["run",
+                       "--directory",
+                       "D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\04 MCP Servers and Local Agent\\servers",
+                       "math_server.py"]
+          }
+        
+      }
+    }
