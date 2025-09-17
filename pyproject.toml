@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.116.1",
+    "fastmcp>=2.12.3",
     "matplotlib>=3.10.6",
     "mcp[cli]>=1.14.0",
     "numpy>=2.3.3",
