@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP: Tools, Resources & Prompts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .article-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 60px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 6s ease-in-out infinite;
+        }
+
+        .main-subtitle {
+            font-size: 1.5rem;
+            color: #b0b0b0;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #ffffff;
+            border-bottom: 3px solid #4ecdc4;
+            padding-bottom: 15px;
+        }
+
+        .section-subtitle {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #e0e0e0;
+        }
+
+        .content-block {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 12px 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .feature-list li:before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #4ecdc4;
+            font-size: 0.8rem;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .code-container {
+            background: #1a1a2e;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-header {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px 20px;
+            font-size: 0.9rem;
+            color: #ccc;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+        }
+
+        .code-block {
+            padding: 0;
+            margin: 0;
+            background: transparent !important;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Enhanced Prism theme customization */
+        .token.keyword {
+            color: #ff79c6 !important;
+        }
+
+        .token.string {
+            color: #f1fa8c !important;
+        }
+
+        .token.function {
+            color: #50fa7b !important;
+        }
+
+        .token.number {
+            color: #bd93f9 !important;
+        }
+
+        .token.comment {
+            color: #6272a4 !important;
+        }
+
+        .token.decorator {
+            color: #ff79c6 !important;
+        }
+
+        .token.operator {
+            color: #ff79c6 !important;
+        }
+
+        .token.punctuation {
+            color: #f8f8f2 !important;
+        }
+
+        .token.class-name {
+            color: #8be9fd !important;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .comparison-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comparison-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-color);
+        }
+
+        .comparison-card:nth-child(1) {
+            --card-color: #ff6b6b;
+        }
+
+        .comparison-card:nth-child(2) {
+            --card-color: #4ecdc4;
+        }
+
+        .comparison-card:nth-child(3) {
+            --card-color: #ffd700;
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--card-color);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            border-left: 4px solid #4ecdc4;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+
+        .highlight-box h3 {
+            color: #4ecdc4;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .workflow-diagram {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .intro-text {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            margin-bottom: 40px;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .emphasis {
+            color: #4ecdc4;
+            font-weight: 600;
+        }
+
+        .warning-note {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .scroll-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .article-container {
+                padding: 40px 20px;
+            }
+            
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-section {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-indicator">
+        <div class="scroll-progress" id="scrollProgress"></div>
+    </div>
+
+    <div class="article-container">
+        <!-- Header -->
+        <div class="header-section">
+            <h1 class="main-title">MCP Framework</h1>
+            <p class="main-subtitle">Tools, Resources & Prompts</p>
+            <p class="intro-text">
+                Understanding the three core capabilities of the Model Context Protocol: 
+                <span class="emphasis">Tools</span> for execution, 
+                <span class="emphasis">Resources</span> for knowledge, and 
+                <span class="emphasis">Prompts</span> for guidance
+            </p>
+        </div>
+
+        <!-- Introduction -->
+        <div class="section">
+            <h2 class="section-title">Introduction to MCP Capabilities</h2>
+            <div class="highlight-box">
+                <h3>The Three Pillars of MCP</h3>
+                <ul class="feature-list">
+                    <li><strong>Tools:</strong> Model-controlled actions - "Do something now" pattern</li>
+                    <li><strong>Resources:</strong> Application-controlled context - "Here's information" pattern</li>
+                    <li><strong>Prompts:</strong> User-controlled interactions - "Here's how to think" pattern</li>
+                </ul>
+            </div>
+            <p style="font-size: 1.1rem; color: #ccc; text-align: center; margin-top: 30px;">
+                Each component serves a distinct purpose in creating powerful, modular AI workflows through coordinated interaction patterns.
+            </p>
+        </div>
+
+        <!-- Resources Section -->
+        <div class="section">
+            <h2 class="section-title">Resources: The Knowledge Layer</h2>
+            
+            <div class="content-block">
+                <h3 class="section-subtitle">What Are Resources?</h3>
+                <p style="margin-bottom: 20px;">
+                    Resources are read-only interfaces that expose data as structured, contextual information. 
+                    They act as intelligent knowledge bases, allowing models to access and reason about information 
+                    without causing side effects.
+                </p>
+                <div class="warning-note">
+                    <strong>Note:</strong> In programming, a "side effect" refers to any observable change in system state 
+                    beyond simply returning a value - like writing files, updating databases, or making API calls.
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-block">
+                    <h4 style="color: #4ecdc4; margin-bottom: 15px;">Resource Types</h4>
+                    <ul class="feature-list">
+                        <li><strong>Text Resources:</strong> UTF-8 encoded text data</li>
+                        <li><strong>Binary Resources:</strong> Base64-encoded binary data</li>
+                        <li><strong>Static Resources:</strong> Fixed URI and content</li>
+                        <li><strong>Dynamic Resources:</strong> URI templates with parameters</li>
+                    </ul>
+                </div>
+                <div class="content-block">
+                    <h4 style="color: #4ecdc4; margin-bottom: 15px;">Common Use Cases</h4>
+                    <ul class="feature-list">
+                        <li>File contents and documentation</li>
+                        <li>API cached responses</li>
+                        <li>Database snapshots</li>
+                        <li>Configuration files</li>
+                        <li>System logs and documentation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">Static Resource Implementation</h3>
+            <div class="code-container">
+                <div class="code-header">Static Resource Example</div>
+                <pre class="code-block"><code class="language-python">@mcp.resource("file://about")
+def get_about_info() -> str:
+    """Reads and returns contents of a static text file."""
+    with open("about.txt", "r", encoding="utf-8") as f:
+        return f.read()</code></pre>
+            </div>
+
+            <h3 class="section-subtitle">Dynamic Resource Templates</h3>
+            <div class="code-container">
+                <div class="code-header">Dynamic Resource with URI Template</div>
+                <pre class="code-block"><code class="language-python">@mcp.resource("file://{path}/data.json")
+def read_file(path: str) -> str:
+    """Read the contents of a file at the given path."""
+    with open(f"{path}/data.json", 'r') as f:
+        return f.read()</code></pre>
+            </div>
+            
+            <p style="margin: 20px 0; color: #ccc;">
+                Resource templates follow RFC 6570 standards and are particularly powerful for scalable implementations. 
+                Instead of registering thousands of individual files, a server can expose a single template that covers 
+                entire families of resources.
+            </p>
+
+            <h3 class="section-subtitle">Resource Metadata Customization</h3>
+            <div class="code-container">
+                <div class="code-header">Resource with Full Metadata</div>
+                <pre class="code-block"><code class="language-python">@mcp.resource(
+    uri="data://app-status",
+    name="ApplicationStatus",
+    description="Provides the current status of the application.",
+    mime_type="application/json",
+    tags={"monitoring", "status"}
+)
+def get_application_status() -> dict:
+    """
+    Internal function description docstring
+    (this is ignored if description is provided above)
+    """
+    return {
+        "status": "ok",
+        "uptime": 12345,
+        "version": "1.2.0"
+    }</code></pre>
+            </div>
+
+            <h3 class="section-subtitle">Duplicate Resource Management</h3>
+            <div class="code-container">
+                <div class="code-header">FastMCP Server Configuration</div>
+                <pre class="code-block"><code class="language-python">mcp = FastMCP(
+    name="SampleServer",
+    on_duplicate_resources="error"  # Raise error on duplicates
+)</code></pre>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>Duplicate Behavior Options</h3>
+                <ul class="feature-list">
+                    <li><strong>"warn"</strong> (default): Logs a warning, new resource replaces old one</li>
+                    <li><strong>"error"</strong>: Raises ValueError, prevents duplicate registration</li>
+                    <li><strong>"replace"</strong>: Silently replaces existing resource with new one</li>
+                    <li><strong>"ignore"</strong>: Keeps original resource, ignores new registration</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Prompts Section -->
+        <div class="section">
+            <h2 class="section-title">Prompts: The Guidance Layer</h2>
+            
+            <div class="content-block">
+                <h3 class="section-subtitle">Understanding Prompts in MCP</h3>
+                <p style="margin-bottom: 20px;">
+                    Prompts are predefined message templates that encapsulate reusable instructions for LLMs. 
+                    They serve as instructional blueprints, domain-specific reasoning setups, and multi-turn 
+                    conversational flows that clients can explicitly invoke.
+                </p>
+                <div class="workflow-diagram">
+                    <p><strong>Key Insight:</strong> Prompts are selected by the user and set the context before the model begins generating</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-block">
+                    <h4 style="color: #ffd700; margin-bottom: 15px;">Why Use Prompts?</h4>
+                    <ul class="feature-list">
+                        <li>Centralized, server-defined strategies</li>
+                        <li>Eliminates manual prompt writing</li>
+                        <li>Discoverable via /prompts/list</li>
+                        <li>Server-side updates possible</li>
+                        <li>Domain expertise encapsulation</li>
+                    </ul>
+                </div>
+                <div class="content-block">
+                    <h4 style="color: #ffd700; margin-bottom: 15px;">Prompt Applications</h4>
+                    <ul class="feature-list">
+                        <li>Instructional blueprints</li>
+                        <li>Domain-specific reasoning</li>
+                        <li>Multi-turn conversations</li>
+                        <li>Task-specific agents</li>
+                        <li>Standardized output formats</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">Basic Prompt Implementation</h3>
+            <div class="code-container">
+                <div class="code-header">Simple String Prompt</div>
+                <pre class="code-block"><code class="language-python">@mcp.prompt()
+def ask_about_topic(topic: str) -> str:
+    """Ask for an explanation of a topic."""
+    return f"Can you explain the concept of '{topic}'?"</code></pre>
+            </div>
+
+            <h3 class="section-subtitle">Advanced PromptMessage Implementation</h3>
+            <div class="code-container">
+                <div class="code-header">Structured PromptMessage</div>
+                <pre class="code-block"><code class="language-python">from fastmcp import FastMCP
+from fastmcp.prompts.prompt import PromptMessage, TextContent
+
+# Prompt returning a specific message type
+@mcp.prompt()
+def generate_code_request(language: str, task_description: str) -> PromptMessage:
+    """Generates a user message requesting code generation."""
+    content = f"""Write a {language} function that
+performs the following task:
+{task_description}
+"""
+    return PromptMessage(
+        role="user",
+        content=TextContent(type="text", text=content)
+    )</code></pre>
+            </div>
+
+            <h3 class="section-subtitle">Multi-turn Conversations</h3>
+            <div class="code-container">
+                <div class="code-header">Multi-turn with PromptMessage</div>
+                <pre class="code-block"><code class="language-python">@mcp.prompt()
+def roleplay(character: str) -> list[PromptMessage]:
+    return [
+        PromptMessage(role="user",
+                     content=TextContent(text=f"Behave like {character}.")),
+        PromptMessage(role="assistant", 
+                     content=TextContent(text="Understood. I'm ready."))
+    ]</code></pre>
+            </div>
+
+            <div class="code-container">
+                <div class="code-header">Simplified with Message Constructor</div>
+                <pre class="code-block"><code class="language-python">from fastmcp.prompts.prompt import Message
+
+@mcp.prompt()
+def roleplay(character: str) -> list[PromptMessage]:
+    return [
+        Message(f"You are now {character}. Respond in character."),
+        Message("Understood. I'm ready.", role="assistant")
+    ]</code></pre>
+            </div>
+
+            <h3 class="section-subtitle">Type Annotations & Validation</h3>
+            <div class="code-container">
+                <div class="code-header">Type-Annotated Prompt with Validation</div>
+                <pre class="code-block"><code class="language-python">from pydantic import Field
+from typing import Literal, Optional
+
+@mcp.prompt()
+def content(
+    topic: str = Field(description="The subject to cover"),
+    formatting: Literal["blog", "email", "social"] = "blog",
+    tone: str = "professional",
+    word_count: Optional[int] = None
+) -> str:
+    """Create a request for generating content in a specific format."""
+    prompt = f"Please write a {formatting} post about {topic} in a {tone} tone."
+    if word_count:
+        prompt += f" It should be approximately {word_count} words long."
+    return prompt</code></pre>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Type Annotation Benefits</h3>
+                <ul class="feature-list">
+                    <li>Automatic input validation from clients</li>
+                    <li>Schema generation for MCP protocol</li>
+                    <li>Better IDE support and documentation</li>
+                    <li>Runtime parameter checking</li>
+                </ul>
+            </div>
+
+            <h3 class="section-subtitle">Prompt Metadata & Control</h3>
+            <div class="code-container">
+                <div class="code-header">Custom Metadata and Tags</div>
+                <pre class="code-block"><code class="language-python">@mcp.prompt(
+    name="analyze_data_request",
+    description="Creates a request to analyze data",
+    tags={"analysis", "data"}
+)
+def data_analysis_prompt(...) -> str:
+    ...</code></pre>
+            </div>
+
+            <div class="code-container">
+                <div class="code-header">Disabling Prompts</div>
+                <pre class="code-block"><code class="language-python">@mcp.prompt(enabled=False)
+def my_prompt_method(...) -> str:
+    """This prompt won't appear in available prompts list."""
+    ...</code></pre>
+            </div>
+
+            <div class="code-container">
+                <div class="code-header">Duplicate Prompt Handling</div>
+                <pre class="code-block"><code class="language-python">mcp = FastMCP(
+    name="SampleServer",
+    on_duplicate_prompts="error"  # Raise error if prompt name is duplicated
+)</code></pre>
+            </div>
+        </div>
+
+        <!-- Key Distinctions -->
+        <div class="section">
+            <h2 class="section-title">Key Distinctions Between Components</h2>
+            
+            <div class="content-block">
+                <p style="font-size: 1.1rem; margin-bottom: 30px;">
+                    The fundamental distinction lies in <strong>who controls what</strong> and <strong>when things happen</strong>:
+                </p>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">🔧 Tools</div>
+                    <p><strong>Control:</strong> Model-controlled</p>
+                    <p><strong>Pattern:</strong> "Do something now"</p>
+                    <ul class="feature-list">
+                        <li>AI-initiated execution</li>
+                        <li>Dynamic operations</li>
+                        <li>Side effects allowed</li>
+                        <li>Requires user permission</li>
+                        <li>Real-time results</li>
+                    </ul>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">📚 Resources</div>
+                    <p><strong>Control:</strong> Application-controlled</p>
+                    <p><strong>Pattern:</strong> "Here's information"</p>
+                    <ul class="feature-list">
+                        <li>Read-only access</li>
+                        <li>Contextual information</li>
+                        <li>No side effects</li>
+                        <li>Reference material</li>
+                        <li>URI-based identification</li>
+                    </ul>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">💭 Prompts</div>
+                    <p><strong>Control:</strong> User-controlled</p>
+                    <p><strong>Pattern:</strong> "Here's how to think"</p>
+                    <ul class="feature-list">
+                        <li>User-initiated workflows</li>
+                        <li>Templated structures</li>
+                        <li>Reusable patterns</li>
+                        <li>Workflow-oriented</li>
+                        <li>Interactive guidance</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">When to Use Each Component</h3>
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">Use Tools When</div>
+                    <ul class="feature-list">
+                        <li>Data is dynamic and requires real-time fetching</li>
+                        <li>Computation needed based on user input</li>
+                        <li>External APIs must be called with parameters</li>
+                        <li>Actions need to be performed</li>
+                        <li>Filtering/processing required before results</li>
+                    </ul>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">Use Resources When</div>
+                    <ul class="feature-list">
+                        <li>Data is static or changes infrequently</li>
+                        <li>Documentation needs to be referenced</li>
+                        <li>Context needed for AI reasoning</li>
+                        <li>Background knowledge required</li>
+                        <li>Pre-existing datasets should be available</li>
+                    </ul>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">Use Prompts When</div>
+                    <ul class="feature-list">
+                        <li>Standardized workflows need structure</li>
+                        <li>Complex interactions need guidance</li>
+                        <li>Domain expertise can be captured</li>
+                        <li>User onboarding requires guidance</li>
+                        <li>Consistent patterns should be embedded</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Practical Example -->
+        <div class="section">
+            <h2 class="section-title">Practical Demonstration: Job Search Assistant</h2>
+            
+            <div class="workflow-diagram">
+                <h3 style="color: #4ecdc4; margin-bottom: 20px;">Complete MCP Workflow Architecture</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center;">
+                    <div>
+                        <strong style="color: #ff6b6b;">Tools Layer</strong><br>
+                        search_jobs(), save_job()
+                    </div>
+                    <div>
+                        <strong style="color: #4ecdc4;">Resources Layer</strong><br>
+                        resume://default, jobs://saved
+                    </div>
+                    <div>
+                        <strong style="color: #ffd700;">Prompts Layer</strong><br>
+                        analyze_job_market(), recommendations()
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3 style="color: #ff6b6b; margin-bottom: 20px;">Tools Implementation</h3>
+                <ul class="feature-list">
+                    <li><strong>search_jobs():</strong> Fetches job listings using JSearch API based on role and location parameters</li>
+                    <li><strong>save_job():</strong> Allows users to save specific jobs in structured format with essential information</li>
+                    <li>Both tools store raw results and return key details for model response generation</li>
+                    <li>Real-time data processing with dynamic parameter handling</li>
+                </ul>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-block">
+                    <h4 style="color: #4ecdc4; margin-bottom: 15px;">Resources Layer</h4>
+                    <ul class="feature-list">
+                        <li><strong>resume://default:</strong> User's resume content</li>
+                        <li><strong>jobs://saved:</strong> Saved job listings</li>
+                        <li>Static reference material for AI reasoning</li>
+                        <li>Structured data access without side effects</li>
+                    </ul>
+                </div>
+                <div class="content-block">
+                    <h4 style="color: #ffd700; margin-bottom: 15px;">Prompts Layer</h4>
+                    <ul class="feature-list">
+                        <li><strong>analyze_job_market():</strong> Analyzes jobs for trends</li>
+                        <li><strong>personalized_job_recommender():</strong> Uses resume for tailored recommendations</li>
+                        <li><strong>create_match_report():</strong> Resume-to-job matching analysis</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Workflow Process</h3>
+                <ol style="list-style: decimal; margin-left: 20px;">
+                    <li>User inputs query through MCP host (Claude Desktop)</li>
+                    <li>MCP server decides which tools/resources/prompts to invoke based on query context</li>
+                    <li>Relevant components execute in coordinated manner</li>
+                    <li>Results returned to MCP host where LLM generates final response</li>
+                </ol>
+            </div>
+
+            <div class="content-block">
+                <p style="margin-bottom: 20px;">
+                    This demonstrates the power of coordinated MCP usage - tools fetch dynamic data, 
+                    resources provide context, and prompts guide the analysis workflow.
+                </p>
+            </div>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="section">
+            <h2 class="section-title">Best Practices & Configuration</h2>
+            
+            <div class="code-container">
+                <div class="code-header">Comprehensive FastMCP Server Setup</div>
+                <pre class="code-block"><code class="language-python"># Initialize FastMCP with all duplicate handling options
+mcp = FastMCP(
+    name="job-search-assistant",
+    on_duplicate_tools="error",      # Prevent tool conflicts
+    on_duplicate_resources="warn",   # Log resource replacements  
+    on_duplicate_prompts="replace"   # Allow prompt updates
+)
+
+# All three duplicate handling settings available:
+# - on_duplicate_tools
+# - on_duplicate_resources  
+# - on_duplicate_prompts</code></pre>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-block">
+                    <h4 style="color: #4ecdc4; margin-bottom: 15px;">Development Guidelines</h4>
+                    <ul class="feature-list">
+                        <li>Use clear, descriptive function names and docstrings</li>
+                        <li>Implement comprehensive error handling</li>
+                        <li>Add detailed type annotations for validation</li>
+                        <li>Configure appropriate duplicate handling strategies</li>
+                        <li>Test all components thoroughly in isolation</li>
+                    </ul>
+                </div>
+                <div class="content-block">
+                    <h4 style="color: #ff6b6b; margin-bottom: 15px;">Security Considerations</h4>
+                    <ul class="feature-list">
+                        <li>Validate all input parameters rigorously</li>
+                        <li>Implement explicit user permission checks</li>
+                        <li>Sanitize file paths and URLs properly</li>
+                        <li>Limit resource access scope appropriately</li>
+                        <li>Monitor and log tool execution patterns</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Return Type Handling in FastMCP</h3>
+                <ul class="feature-list">
+                    <li><strong>str:</strong> Automatically converted to single PromptMessage object</li>
+                    <li><strong>PromptMessage:</strong> Used directly as provided</li>
+                    <li><strong>list[PromptMessage | str]:</strong> Used as sequence of messages (conversation)</li>
+                    <li><strong>Any:</strong> Attempted conversion to string, then used as PromptMessage</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Use Case Examples -->
+        <div class="section">
+            <h2 class="section-title">Real-World Use Case Examples</h2>
+
+            <div class="content-grid">
+                <div class="content-block">
+                    <h4 style="color: #4ecdc4; margin-bottom: 15px;">Software Development Assistant</h4>
+                    <ul class="feature-list">
+                        <li><strong>Tools:</strong> Code generation, execution, and testing</li>
+                        <li><strong>Resources:</strong> Language documentation and company standards</li>
+                        <li><strong>Prompts:</strong> Bug analysis and code review workflows</li>
+                    </ul>
+                </div>
+                <div class="content-block">
+                    <h4 style="color: #4ecdc4; margin-bottom: 15px;">Customer Service Platform</h4>
+                    <ul class="feature-list">
+                        <li><strong>Tools:</strong> Real-time order lookup and return processing</li>
+                        <li><strong>Resources:</strong> Platform policies and customer data</li>
+                        <li><strong>Prompts:</strong> Complex issue resolution workflows</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Application-Controlled vs Model-Controlled Access Patterns</h4>
+                <div class="workflow-diagram">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; text-align: left;">
+                        <div>
+                            <strong style="color: #ff6b6b;">Tools (Model-Controlled):</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>LLM decides when to execute</li>
+                                <li>User approval required</li>
+                                <li>Real-time invocation</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color: #4ecdc4;">Resources (Application-Controlled):</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Client fetches explicitly</li>
+                                <li>User may select resources</li>
+                                <li>Provided before LLM processing</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conclusion -->
+        <div class="section">
+            <h2 class="section-title">Key Takeaways</h2>
+            
+            <div class="highlight-box">
+                <h3>MCP's Unified Approach to AI Workflows</h3>
+                <p style="font-size: 1.2rem; margin-bottom: 25px;">
+                    Tools, Resources, and Prompts work together to create powerful, modular AI workflows 
+                    through coordinated interaction patterns and clear separation of concerns.
+                </p>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="card-title">Modularity</div>
+                    <p>Components can be developed, maintained, and updated independently with clear interfaces and minimal interdependence.</p>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">Scalability</div>
+                    <p>Easy to add new capabilities without disrupting existing functionality through URI templates and dynamic resource discovery.</p>
+                </div>
+                <div class="comparison-card">
+                    <div class="card-title">Security</div>
+                    <p>Clear separation of concerns with appropriate access controls, user permissions, and controlled execution patterns.</p>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3 style="color: #4ecdc4; margin-bottom: 20px;">Integration Benefits</h3>
+                <div class="content-grid">
+                    <div>
+                        <ul class="feature-list">
+                            <li>Consistent interaction patterns across components</li>
+                            <li>Maintainable and testable AI workflows</li>
+                            <li>Reusable components across different applications</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul class="feature-list">
+                            <li>Clear boundaries between data types and operations</li>
+                            <li>Standardized discovery and execution mechanisms</li>
+                            <li>Flexible duplicate handling strategies</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-diagram">
+                <h3 style="color: #ffd700; margin-bottom: 20px;">Remember the Core Principle</h3>
+                <p style="font-size: 1.3rem; color: #e0e0e0;">
+                    Match the primitive to the specific use case based on <strong>data dynamism</strong>, 
+                    <strong>required actions</strong>, and <strong>control patterns</strong>
+                </p>
+            </div>
+
+            <div class="warning-note">
+                <strong>Important:</strong> Understanding these distinctions enables developers to build more effective, 
+                secure, and user-friendly AI integrations while adhering to the Model Context Protocol's design principles.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll progress indicator
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (scrollTop / scrollHeight) * 100;
+            document.getElementById('scrollProgress').style.width = scrolled + '%';
+        });
+
+        // Smooth scrolling enhancement
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Initialize Prism syntax highlighting
+        Prism.highlightAll();
+
+        // Add subtle scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections for animation
+        document.querySelectorAll('.section, .content-block, .code-container').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
