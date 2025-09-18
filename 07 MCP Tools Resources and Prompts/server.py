@@ -37,8 +37,6 @@ RAPIDAPI_HOST = os.getenv("RAPIDAPI_HOST")  # JSearch API host
 # Initialize the FastMCP server with a name
 mcp = FastMCP("Job Market Explorer")
 
-
-
 # === Tool: Search Jobs ===
 # Tool: Defines a function to search for jobs using the JSearch API and returns summarized job info.
 
