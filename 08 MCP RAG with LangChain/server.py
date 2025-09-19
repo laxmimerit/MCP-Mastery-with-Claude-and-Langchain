@@ -36,46 +36,24 @@ COLLECTION_NAME = "documents"
 # --- Initialize ---
 mcp = FastMCP("langchain-vector-db")
 
-# Globals
-vectorstore = None
-embeddings = None
-text_splitter = None
+# Initialize static objects directly
+embeddings = OllamaEmbeddings(
+    model=EMBED_MODEL,
+    base_url=OLLAMA_BASE_URL
+)
 
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=CHUNK_SIZE,
+    chunk_overlap=CHUNK_OVERLAP,
+    length_function=len,
+    separators=["\n\n", "\n", " ", ""]
+)
 
-def get_embeddings():
-    """Get or create Ollama embeddings"""
-    global embeddings
-    if embeddings is None:
-        embeddings = OllamaEmbeddings(
-            model=EMBED_MODEL,
-            base_url=OLLAMA_BASE_URL
-        )
-    return embeddings
-
-
-def get_text_splitter():
-    """Get or create text splitter"""
-    global text_splitter
-    if text_splitter is None:
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=CHUNK_SIZE,
-            chunk_overlap=CHUNK_OVERLAP,
-            length_function=len,
-            separators=["\n\n", "\n", " ", ""]
-        )
-    return text_splitter
-
-
-def get_vectorstore():
-    """Get or create Chroma vectorstore"""
-    global vectorstore
-    if vectorstore is None:
-        vectorstore = Chroma(
-            persist_directory=CHROMA_PATH,
-            embedding_function=get_embeddings(),
-            collection_name=COLLECTION_NAME
-        )
-    return vectorstore
+vectorstore = Chroma(
+    persist_directory=CHROMA_PATH,
+    embedding_function=embeddings,
+    collection_name=COLLECTION_NAME
+)
 
 
 def extract_text_from_pdf(pdf_path: str) -> str:
@@ -111,19 +89,17 @@ def process_single_pdf(pdf_path: str) -> int:
         }
     )
     
-    # Split into chunks
-    splitter = get_text_splitter()
-    chunks = splitter.split_documents([doc])
+    # Split into chunks using global text_splitter
+    chunks = text_splitter.split_documents([doc])
     
     # Add chunk index to metadata
     for i, chunk in enumerate(chunks):
         chunk.metadata["chunk_index"] = i
         chunk.metadata["total_chunks"] = len(chunks)
     
-    # Add to vectorstore
-    store = get_vectorstore()
+    # Add to vectorstore using global vectorstore
     ids = [f"{Path(pdf_path).stem}_chunk_{i}" for i in range(len(chunks))]
-    store.add_documents(documents=chunks, ids=ids)
+    vectorstore.add_documents(documents=chunks, ids=ids)
         
     return len(chunks)
 
@@ -232,10 +208,8 @@ async def retrieve(query: str, n: int = 5) -> List[Dict[str, Any]]:
         Top N matching chunks with scores
     """
     try:
-        store = get_vectorstore()
-        
-        # Perform similarity search with scores
-        results = store.similarity_search_with_score(query, k=n)
+        # Use global vectorstore directly
+        results = vectorstore.similarity_search_with_score(query, k=n)
         
         # Format results
         chunks = []
@@ -262,10 +236,8 @@ async def db_info() -> Dict[str, Any]:
         Database and collection statistics
     """
     try:
-        store = get_vectorstore()
-        
-        # Get the underlying Chroma collection
-        collection = store._collection
+        # Use global vectorstore directly
+        collection = vectorstore._collection
         
         # Get count
         count = collection.count()
@@ -313,12 +285,17 @@ async def clear_db() -> Dict[str, Any]:
     """
     try:
         global vectorstore
+
         # Delete the collection
-        if vectorstore is not None:
-            vectorstore.delete_collection()
-            vectorstore = None
-        # Recreate empty vectorstore
-        vectorstore = get_vectorstore()
+        vectorstore.delete_collection()
+        
+        # Recreate empty vectorstore with same configuration
+        vectorstore = Chroma(
+            persist_directory=CHROMA_PATH,
+            embedding_function=embeddings,
+            collection_name=COLLECTION_NAME
+        )
+        
         return {
             "status": "success",
             "message": "Database cleared and reset"
@@ -328,7 +305,6 @@ async def clear_db() -> Dict[str, Any]:
             "status": "error",
             "message": str(e)
         }
-
 
 
 # --- Main ---
