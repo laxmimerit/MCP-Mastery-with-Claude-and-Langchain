@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Vector Database System Architecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .flow-diagram {
+            grid-column: 1 / -1;
+            background: white;
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .flow-step::after {
+            content: '↓';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: #667eea;
+        }
+        
+        .flow-step:last-child::after {
+            display: none;
+        }
+        
+        .step-number {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .component-box {
+            background: #e6fffa;
+            border: 2px solid #38b2ac;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            text-align: center;
+            font-weight: 500;
+            color: #2d3748;
+        }
+        
+        .config-item {
+            background: #fff5f5;
+            border-left: 3px solid #f56565;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 0 5px 5px 0;
+            font-size: 13px;
+        }
+        
+        .tool-item {
+            background: #f0fff4;
+            border-left: 3px solid #48bb78;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 0 5px 5px 0;
+            font-size: 13px;
+        }
+        
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .arch-component {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .arch-component h4 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .arch-component p {
+            color: #4a5568;
+            font-size: 12px;
+        }
+        
+        .data-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(90deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 10px;
+        }
+        
+        .data-flow-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .data-flow-item h4 {
+            color: #2d3748;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .data-flow-item p {
+            color: #4a5568;
+            font-size: 11px;
+        }
+        
+        .arrow {
+            color: #667eea;
+            font-size: 24px;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 MCP Vector Database System Architecture</h1>
+            <p>LangChain + ChromaDB + Ollama Embeddings + FastMCP Integration</p>
+        </div>
+        
+        <div class="content">
+            <!-- System Components -->
+            <div class="section">
+                <h2>🏗️ Core Components</h2>
+                <div class="component-box">FastMCP Server</div>
+                <div class="component-box">ChromaDB Vector Store</div>
+                <div class="component-box">Ollama Embeddings</div>
+                <div class="component-box">LangChain Integration</div>
+                <div class="component-box">PyPDF2 Text Extractor</div>
+            </div>
+            
+            <!-- Configuration -->
+            <div class="section">
+                <h2>⚙️ Configuration</h2>
+                <div class="config-item"><strong>Model:</strong> nomic-embed-text</div>
+                <div class="config-item"><strong>Chunk Size:</strong> 4096 tokens</div>
+                <div class="config-item"><strong>Overlap:</strong> 409 tokens (10%)</div>
+                <div class="config-item"><strong>DB Path:</strong> ./chroma_db</div>
+                <div class="config-item"><strong>Collection:</strong> documents</div>
+                <div class="config-item"><strong>Ollama URL:</strong> localhost:11434</div>
+            </div>
+            
+            <!-- MCP Tools -->
+            <div class="section">
+                <h2>🛠️ Available MCP Tools</h2>
+                <div class="tool-item"><strong>ingest_pdf:</strong> Add PDFs (file/folder/URL)</div>
+                <div class="tool-item"><strong>retrieve:</strong> Search similarity chunks</div>
+                <div class="tool-item"><strong>db_info:</strong> Get database statistics</div>
+                <div class="tool-item"><strong>clear_db:</strong> Clear entire database</div>
+            </div>
+            
+            <!-- Static Initialization -->
+            <div class="section">
+                <h2>🚀 Static Initialization</h2>
+                <div class="arch-component">
+                    <h4>Module Load Time</h4>
+                    <p>All objects created at startup</p>
+                </div>
+                <div class="arch-component">
+                    <h4>No Lazy Loading</h4>
+                    <p>Direct access to global objects</p>
+                </div>
+                <div class="arch-component">
+                    <h4>Memory Efficient</h4>
+                    <p>Single instance pattern</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Flow Diagram -->
+        <div class="flow-diagram">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #2d3748;">📊 Data Processing Flow</h2>
+            
+            <div class="data-flow">
+                <div class="data-flow-item">
+                    <h4>📁 Input Source</h4>
+                    <p>PDF File/Folder/URL</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-flow-item">
+                    <h4>📄 Text Extraction</h4>
+                    <p>PyPDF2 Reader</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-flow-item">
+                    <h4>✂️ Text Chunking</h4>
+                    <p>RecursiveCharacterTextSplitter</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-flow-item">
+                    <h4>🧮 Embeddings</h4>
+                    <p>Ollama nomic-embed-text</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-flow-item">
+                    <h4>💾 Vector Storage</h4>
+                    <p>ChromaDB Collection</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h3 style="text-align: center; margin-bottom: 15px; color: #2d3748;">🔄 System Workflow</h3>
+                
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>Static Initialization:</strong> embeddings, text_splitter, vectorstore objects created at module load
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>PDF Ingestion:</strong> Client calls ingest_pdf() via MCP with source path/URL/folder
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>Text Processing:</strong> PyPDF2 extracts text → RecursiveCharacterTextSplitter creates chunks
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div>
+                        <strong>Vector Creation:</strong> Ollama embeddings generate vectors → ChromaDB stores with metadata
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div>
+                        <strong>Query & Retrieval:</strong> Client searches via retrieve() → Similarity search returns top-N chunks
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Architecture Overview -->
+            <div style="margin-top: 30px;">
+                <h3 style="text-align: center; margin-bottom: 15px; color: #2d3748;">🏛️ System Architecture</h3>
+                <div class="architecture-grid">
+                    <div class="arch-component">
+                        <h4>🔌 MCP Layer</h4>
+                        <p>FastMCP handles client communication and tool routing</p>
+                    </div>
+                    <div class="arch-component">
+                        <h4>🔧 Processing Layer</h4>
+                        <p>PDF extraction, text splitting, and document processing</p>
+                    </div>
+                    <div class="arch-component">
+                        <h4>🧠 AI Layer</h4>
+                        <p>Ollama embeddings for semantic vector generation</p>
+                    </div>
+                    <div class="arch-component">
+                        <h4>💾 Storage Layer</h4>
+                        <p>ChromaDB for persistent vector storage and retrieval</p>
+                    </div>
+                    <div class="arch-component">
+                        <h4>🔍 Search Layer</h4>
+                        <p>Similarity search with scoring and ranking</p>
+                    </div>
+                    <div class="arch-component">
+                        <h4>📡 Integration Layer</h4>
+                        <p>LangChain orchestrates all components seamlessly</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

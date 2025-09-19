@@ -29,8 +29,8 @@ current_dir = Path(__file__).parent
 CHROMA_PATH = os.path.join(current_dir, "chroma_db")
 EMBED_MODEL = "nomic-embed-text"
 OLLAMA_BASE_URL = "http://localhost:11434"
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
+CHUNK_SIZE = 4096
+CHUNK_OVERLAP = CHUNK_SIZE // 10  # 10% overlap
 COLLECTION_NAME = "documents"
 
 # --- Initialize ---
