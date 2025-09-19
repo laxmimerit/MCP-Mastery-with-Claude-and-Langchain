@@ -263,19 +263,5 @@ def get_topic_info(topic: str) -> str:
         return f"Error getting topic info: {str(e)}"
 
 if __name__ == "__main__":
-    print("=" * 50)
-    print("Research Assistant MCP Server with ChromaDB")
-    print("=" * 50)
-    print(f"ChromaDB Root: {CHROMA_DB_ROOT}")
-    print(f"Embedding Model: {EMBED_MODEL}")
-    print(f"Ollama URL: {OLLAMA_BASE_URL}")
-    print("-" * 50)
-    print("Available Tools:")
-    print("  - save_research_data: Save content to topic")
-    print("  - search_research_data: Search within topic")
-    print("  - list_research_topics: List all topics")
-    print("  - delete_research_topic: Delete a topic")
-    print("  - get_topic_info: Get topic details")
-    print("=" * 50)
-    
+
     mcp.run(transport="stdio")

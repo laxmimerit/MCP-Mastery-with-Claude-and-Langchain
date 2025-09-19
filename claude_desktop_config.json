@@ -1,0 +1,103 @@
+{
+	"mcpServers": {
+		"weather": {
+			"command": "uv",
+			"args": [
+				"run",
+				"--directory",
+				"D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\05 MCP Servers with Claude Desktop",
+				"weather_server.py"
+			]
+		},
+		"math_server": {
+			"command": "uv",
+			"args": [
+				"run",
+				"--directory",
+				"D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\05 MCP Servers with Claude Desktop",
+				"math_server.py"
+			]
+		},
+		"playwright": {
+			"command": "npx",
+			"args": [
+				"@playwright/mcp@latest"
+			]
+		},
+		"airbnb": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@openbnb/mcp-server-airbnb",
+				"--ignore-robots-txt"
+			]
+		},
+		"excel": {
+			"command": "cmd",
+			"args": [
+				"/c",
+				"npx",
+				"--yes",
+				"@negokaz/excel-mcp-server"
+			],
+			"env": {
+				"EXCEL_MCP_PAGING_CELLS_LIMIT": "4000"
+			}
+		},
+		"ppt": {
+			"command": "uvx",
+			"args": [
+				"--from",
+				"office-powerpoint-mcp-server",
+				"ppt_mcp_server"
+			],
+			"env": {
+
+			}
+		},
+		"notionApi": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@notionhq/notion-mcp-server"
+			],
+			"env": {
+				"NOTION_TOKEN": "ntn_y26250531798IJZkQl2OcaODAPvAuXjT4T7LQT9lFk5axR"
+			}
+		},
+		"sqlite": {
+			"command": "uvx",
+			"args": [
+				"git+https://github.com/laxmimerit/mcp-server-sqlite.git",
+				"--db-path",
+				"C:\\Users\\laxmi\\Downloads\\employees_db-full-1.0.6.db\\employees_db-full-1.0.6.db"
+			]
+		},
+		"filesystem": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-filesystem",
+				"C:\\Users\\laxmi\\Downloads"
+			]
+		},
+		"job_search": {
+			"command": "uv",
+			"args": [
+				"--directory",
+				"D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\07 MCP Tools Resources and Prompts",
+				"run",
+				"server.py"
+			]
+		},
+		"chroma_db_rag": {
+			"command": "uv",
+			"args": [
+				"--directory",
+				"D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\08 MCP RAG with LangChain",
+				"run",
+				"server.py"
+			]
+		}
+	}
+}

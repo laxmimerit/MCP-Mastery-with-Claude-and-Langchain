@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Assistant Architecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .presentation {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #7f8c8d;
+            font-weight: 300;
+        }
+
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .component {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .component::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-light));
+        }
+
+        .component:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .client {
+            --accent-color: #3498db;
+            --accent-light: #5dade2;
+        }
+
+        .server {
+            --accent-color: #e74c3c;
+            --accent-light: #ec7063;
+        }
+
+        .component-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+            background: var(--accent-color);
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .tech-tag {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .features {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+            padding-left: 30px;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .features li:last-child {
+            border-bottom: none;
+        }
+
+        .features li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .data-flow {
+            grid-column: 1 / -1;
+            margin: 40px 0;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: none;
+            --accent-color: #28a745;
+            --accent-light: #5cbf2a;
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .flow-step {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+            border: 2px solid var(--accent-color);
+        }
+
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        .flow-step h4 {
+            color: var(--accent-color);
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .key-benefits {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            --accent-color: #f39c12;
+            --accent-light: #f1c40f;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .benefit-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .benefit-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        .benefit-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .code-snippet {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .architecture-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .flow-diagram {
+                flex-direction: column;
+            }
+            
+            .flow-step::after {
+                display: none;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .presentation {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <div class="header">
+            <h1>🔬 Research Assistant Architecture</h1>
+            <p class="subtitle">AI-Powered Research with Web Crawling & Vector Storage</p>
+        </div>
+
+        <div class="architecture-grid">
+            <!-- Client Component -->
+            <div class="component client">
+                <h2 class="component-title">
+                    <div class="icon">🖥️</div>
+                    Client (client.py)
+                </h2>
+                
+                <div class="tech-stack">
+                    <span class="tech-tag">LangGraph</span>
+                    <span class="tech-tag">LangChain</span>
+                    <span class="tech-tag">Ollama</span>
+                    <span class="tech-tag">MCP Client</span>
+                </div>
+
+                <ul class="features">
+                    <li><strong>LangGraph Agent:</strong> Orchestrates conversation flow and tool usage</li>
+                    <li><strong>Qwen3 LLM:</strong> Local Ollama model for intelligent responses</li>
+                    <li><strong>Multi-Server MCP:</strong> Connects to multiple MCP servers (Firecrawl + Research)</li>
+                    <li><strong>Tool Binding:</strong> Automatically routes to appropriate tools</li>
+                    <li><strong>Memory State:</strong> Maintains conversation context</li>
+                    <li><strong>Interactive CLI:</strong> User-friendly command interface</li>
+                </ul>
+
+                <div class="code-snippet">
+# Key Architecture Pattern
+llm_with_tools = llm.bind_tools(tools)
+agent = StateGraph(State).compile(
+    checkpointer=MemorySaver()
+)
+                </div>
+            </div>
+
+            <!-- Server Component -->
+            <div class="component server">
+                <h2 class="component-title">
+                    <div class="icon">⚙️</div>
+                    Server (server.py)
+                </h2>
+                
+                <div class="tech-stack">
+                    <span class="tech-tag">FastMCP</span>
+                    <span class="tech-tag">ChromaDB</span>
+                    <span class="tech-tag">LangChain</span>
+                    <span class="tech-tag">Nomic Embeddings</span>
+                </div>
+
+                <ul class="features">
+                    <li><strong>MCP Server:</strong> Provides research tools via Model Context Protocol</li>
+                    <li><strong>ChromaDB Vector Store:</strong> Semantic similarity search & storage</li>
+                    <li><strong>Topic Organization:</strong> Separate databases per research topic</li>
+                    <li><strong>Deduplication:</strong> Content hashing prevents duplicate storage</li>
+                    <li><strong>Embedding Model:</strong> Nomic-embed-text for semantic understanding</li>
+                    <li><strong>CRUD Operations:</strong> Full lifecycle management of research data</li>
+                </ul>
+
+                <div class="code-snippet">
+# Vector Storage Pattern
+vectorstore = Chroma(
+    embedding_function=embeddings,
+    collection_name=f"research_{topic}"
+)
+                </div>
+            </div>
+
+            <!-- Data Flow -->
+            <div class="component data-flow">
+                <h2 class="component-title">
+                    <div class="icon">🔄</div>
+                    Data Flow & Processing
+                </h2>
+
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <h4>1. User Query</h4>
+                        <p>Research request via CLI interface</p>
+                    </div>
+                    <div class="flow-step">
+                        <h4>2. LangGraph Agent</h4>
+                        <p>Analyzes query & selects appropriate tools</p>
+                    </div>
+                    <div class="flow-step">
+                        <h4>3. Tool Execution</h4>
+                        <p>Firecrawl scrapes web or searches vector DB</p>
+                    </div>
+                    <div class="flow-step">
+                        <h4>4. Data Processing</h4>
+                        <p>Content embedding & storage in ChromaDB</p>
+                    </div>
+                    <div class="flow-step">
+                        <h4>5. Response</h4>
+                        <p>Structured answer with source citations</p>
+                    </div>
+                </div>
+
+                <ul class="features">
+                    <li><strong>Intelligent Routing:</strong> Agent automatically chooses between web crawling and vector search</li>
+                    <li><strong>Semantic Search:</strong> Uses embeddings for context-aware information retrieval</li>
+                    <li><strong>Persistent Storage:</strong> Research findings saved across sessions</li>
+                    <li><strong>Topic Isolation:</strong> Separate vector databases prevent cross-contamination</li>
+                </ul>
+            </div>
+
+            <!-- Key Benefits -->
+            <div class="component key-benefits">
+                <h2 class="component-title">
+                    <div class="icon">⭐</div>
+                    Key Architecture Benefits
+                </h2>
+
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🧠</div>
+                        <div class="benefit-title">Intelligent Orchestration</div>
+                        <p>LangGraph manages complex research workflows with automatic tool selection</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🔍</div>
+                        <div class="benefit-title">Semantic Search</div>
+                        <p>ChromaDB provides context-aware search across research topics</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">📚</div>
+                        <div class="benefit-title">Knowledge Persistence</div>
+                        <p>Vector databases maintain research findings across sessions</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🌐</div>
+                        <div class="benefit-title">Web Integration</div>
+                        <p>Firecrawl enables real-time web content extraction</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🏗️</div>
+                        <div class="benefit-title">Modular Design</div>
+                        <p>MCP protocol allows easy integration of new capabilities</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">⚡</div>
+                        <div class="benefit-title">Local Processing</div>
+                        <p>Ollama provides privacy-focused local LLM inference</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Stack Summary -->
+        <div style="margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); border-radius: 15px; color: white; text-align: center;">
+            <h3 style="margin-bottom: 20px; font-size: 1.5em;">🛠️ Complete Technology Stack</h3>
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+                <div>
+                    <strong>AI/ML:</strong><br>
+                    Qwen3, Nomic-embed-text, LangChain
+                </div>
+                <div>
+                    <strong>Orchestration:</strong><br>
+                    LangGraph, FastMCP
+                </div>
+                <div>
+                    <strong>Storage:</strong><br>
+                    ChromaDB, Vector Embeddings
+                </div>
+                <div>
+                    <strong>Integration:</strong><br>
+                    Firecrawl, MCP Protocol
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
