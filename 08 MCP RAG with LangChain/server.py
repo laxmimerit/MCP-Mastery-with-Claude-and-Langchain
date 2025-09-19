@@ -313,20 +313,16 @@ async def clear_db() -> Dict[str, Any]:
     """
     try:
         global vectorstore
-        
         # Delete the collection
         if vectorstore is not None:
             vectorstore.delete_collection()
             vectorstore = None
-        
         # Recreate empty vectorstore
         vectorstore = get_vectorstore()
-        
         return {
             "status": "success",
             "message": "Database cleared and reset"
         }
-    
     except Exception as e:
         return {
             "status": "error",
