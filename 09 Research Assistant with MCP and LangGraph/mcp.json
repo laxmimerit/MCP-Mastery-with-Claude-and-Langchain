@@ -1,0 +1,15 @@
+{
+    "research_server": {
+        "command": "uv",
+        "args": ["--directory",
+                "D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\09 Research Assistant with MCP and LangGraph",
+                "run",
+                "server.py"],
+        "transport": "stdio"
+    },
+    "firecrawl_server": {
+        "command": "npx",
+        "args": ["-y", "firecrawl-mcp"],
+        "transport": "stdio"
+    }
+}
