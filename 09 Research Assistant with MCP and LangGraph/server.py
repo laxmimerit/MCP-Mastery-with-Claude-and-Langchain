@@ -1,12 +1,12 @@
-# server.py -  Research Assistant MCP Server
-# uv add faiss-cpu langchain_community
+# server.py - Research Assistant MCP Server with ChromaDB
+# uv add chromadb langchain-chroma langchain-ollama
 
 from mcp.server.fastmcp import FastMCP
 from pathlib import Path
-from typing import List, Set
-from langchain_community.vectorstores import FAISS
+from typing import List, Set, Dict, Any
+from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
-from langchain.schema import Document
+from langchain_core.documents import Document
 import os
 import shutil
 import hashlib
@@ -15,9 +15,17 @@ import json
 # Initialize MCP Server
 mcp = FastMCP("Research Assistant")
 
-# Constants - Use Path objects consistently
+# Constants
 current_dir = Path(__file__).parent.absolute()
-VECTOR_DB_ROOT = current_dir / "research_vector_dbs"
+CHROMA_DB_ROOT = current_dir / "research_chroma_dbs"
+EMBED_MODEL = "nomic-embed-text"
+OLLAMA_BASE_URL = "http://localhost:11434"
+
+# Initialize embeddings once
+embeddings = OllamaEmbeddings(
+    model=EMBED_MODEL,
+    base_url=OLLAMA_BASE_URL
+)
 
 def get_content_hash(content: str) -> str:
     """Generate a hash for content to check for duplicates."""
@@ -40,6 +48,17 @@ def save_content_hashes(topic_path: Path, hashes: Set[str]):
     with open(metadata_file, 'w') as f:
         json.dump(list(hashes), f)
 
+def get_vectorstore(topic: str) -> Chroma:
+    """Get or create a ChromaDB vectorstore for a topic."""
+    topic_path = CHROMA_DB_ROOT / topic
+    topic_path.mkdir(parents=True, exist_ok=True)
+    
+    return Chroma(
+        persist_directory=str(topic_path),
+        embedding_function=embeddings,
+        collection_name=f"research_{topic}"
+    )
+
 # === Tools ===
 
 @mcp.tool()
@@ -51,11 +70,11 @@ def save_research_data(content: List[str], topic: str = "default") -> str:
         topic: Topic name for organizing the data (creates separate DB)
     """
     try:
-        target_path = VECTOR_DB_ROOT / topic
-        target_path.mkdir(parents=True, exist_ok=True)
+        topic_path = CHROMA_DB_ROOT / topic
+        topic_path.mkdir(parents=True, exist_ok=True)
         
         # Load existing content hashes
-        existing_hashes = load_content_hashes(target_path)
+        existing_hashes = load_content_hashes(topic_path)
         
         # Filter out duplicate content
         new_content = []
@@ -70,30 +89,30 @@ def save_research_data(content: List[str], topic: str = "default") -> str:
         if not new_content:
             return f"No new content to save - all {len(content)} documents already exist in topic: {topic}"
         
-        embeddings = OllamaEmbeddings(
-            model="nomic-embed-text",
-            base_url="http://localhost:11434"
-        )
+        # Get vectorstore for this topic
+        vectorstore = get_vectorstore(topic)
         
-        documents = [Document(page_content=text) for text in new_content]
-        index_file = target_path / "index.faiss"
-        
-        if index_file.exists():
-            # Load existing database and add new documents
-            vectorstore = FAISS.load_local(
-                str(target_path), 
-                embeddings, 
-                allow_dangerous_deserialization=True
+        # Create documents with metadata
+        documents = []
+        doc_ids = []
+        for i, text in enumerate(new_content):
+            content_hash = get_content_hash(text)
+            doc = Document(
+                page_content=text,
+                metadata={
+                    "topic": topic,
+                    "content_hash": content_hash,
+                    "doc_index": len(existing_hashes) + i
+                }
             )
-            vectorstore.add_documents(documents)
-            vectorstore.save_local(str(target_path))
-        else:
-            # Create new database
-            vectorstore = FAISS.from_documents(documents, embeddings)
-            vectorstore.save_local(str(target_path))
+            documents.append(doc)
+            doc_ids.append(f"{topic}_{content_hash}")
+        
+        # Add documents to vectorstore
+        vectorstore.add_documents(documents=documents, ids=doc_ids)
         
         # Save updated content hashes
-        save_content_hashes(target_path, new_hashes)
+        save_content_hashes(topic_path, new_hashes)
         
         return f"Successfully saved {len(new_content)} new documents to topic: {topic} (skipped {len(content) - len(new_content)} duplicates)"
         
@@ -101,7 +120,7 @@ def save_research_data(content: List[str], topic: str = "default") -> str:
         return f"Error saving research data: {str(e)}"
 
 @mcp.tool()
-def search_research_data(query: str, topic: str = "default", max_results: int = 5) -> List[str]:
+def search_research_data(query: str, topic: str = "default", max_results: int = 5) -> str:
     """
     Search through saved research data using semantic similarity.
     Args:
@@ -110,64 +129,75 @@ def search_research_data(query: str, topic: str = "default", max_results: int = 
         max_results: Maximum number of results to return
     """
     try:
-        target_path = VECTOR_DB_ROOT / topic
-        index_file = target_path / "index.faiss"
+        topic_path = CHROMA_DB_ROOT / topic
         
-        if not index_file.exists():
-            return [f"No research data found for topic: {topic}"]
+        if not topic_path.exists():
+            return f"No research data found for topic: {topic}"
         
-        embeddings = OllamaEmbeddings(
-            model="nomic-embed-text",
-            base_url="http://localhost:11434"
-        )
+        # Get vectorstore for this topic
+        vectorstore = get_vectorstore(topic)
         
-        vectorstore = FAISS.load_local(
-            str(target_path), 
-            embeddings, 
-            allow_dangerous_deserialization=True
-        )
+        # Check if collection has any documents
+        try:
+            collection = vectorstore._collection
+            count = collection.count()
+            if count == 0:
+                return f"No documents found in topic: {topic}"
+        except:
+            return f"No research data found for topic: {topic}"
         
-        results = vectorstore.similarity_search(query, k=max_results)
+        # Search for similar documents
+        results = vectorstore.similarity_search_with_score(query, k=max_results)
         
-        # Remove any potential duplicates from search results
-        unique_results = []
-        seen_content = set()
+        if not results:
+            return f"No relevant results found for query: '{query}' in topic: {topic}"
         
-        for result in results:
-            content_hash = get_content_hash(result.page_content)
-            if content_hash not in seen_content:
-                unique_results.append(result.page_content)
-                seen_content.add(content_hash)
+        # Format results
+        formatted_results = []
+        for i, (doc, score) in enumerate(results):
+            similarity = 1 - score  # Convert distance to similarity
+            result_text = f"Result {i+1} (Similarity: {similarity:.3f}):\n{doc.page_content}\n"
+            formatted_results.append(result_text)
         
-        return unique_results
+        return "\n" + "="*50 + "\n".join(formatted_results) + "="*50
         
     except Exception as e:
-        return [f"Error searching research data: {str(e)}"]
+        return f"Error searching research data: {str(e)}"
 
 @mcp.tool()
-def list_research_topics() -> List[str]:
+def list_research_topics() -> str:
     """
     List all available research topics (vector databases).
     """
     try:
-        if not VECTOR_DB_ROOT.exists():
-            return ["No research topics found"]
+        if not CHROMA_DB_ROOT.exists():
+            return "No research topics found"
         
         topics = []
-        for path in VECTOR_DB_ROOT.iterdir():
-            if path.is_dir() and (path / "index.faiss").exists():
-                # Count documents in the topic
+        for path in CHROMA_DB_ROOT.iterdir():
+            if path.is_dir():
+                # Try to get document count from ChromaDB
                 try:
-                    hashes = load_content_hashes(path)
-                    doc_count = len(hashes)
+                    vectorstore = get_vectorstore(path.name)
+                    collection = vectorstore._collection
+                    doc_count = collection.count()
                     topics.append(f"Topic: {path.name} ({doc_count} documents)")
-                except:
-                    topics.append(f"Topic: {path.name}")
+                except Exception as e:
+                    # Fallback to hash count if ChromaDB fails
+                    try:
+                        hashes = load_content_hashes(path)
+                        doc_count = len(hashes)
+                        topics.append(f"Topic: {path.name} ({doc_count} documents)")
+                    except:
+                        topics.append(f"Topic: {path.name}")
         
-        return topics if topics else ["No research topics found"]
+        if not topics:
+            return "No research topics found"
+        
+        return "\n".join(topics)
         
     except Exception as e:
-        return [f"Error listing topics: {str(e)}"]
+        return f"Error listing topics: {str(e)}"
 
 @mcp.tool()
 def delete_research_topic(topic: str) -> str:
@@ -177,18 +207,75 @@ def delete_research_topic(topic: str) -> str:
         topic: Topic name to delete
     """
     try:
-        target_path = VECTOR_DB_ROOT / topic
+        topic_path = CHROMA_DB_ROOT / topic
         
-        if not target_path.exists():
+        if not topic_path.exists():
             return f"Topic '{topic}' does not exist"
         
+        # Try to delete the ChromaDB collection first
+        try:
+            vectorstore = get_vectorstore(topic)
+            vectorstore.delete_collection()
+        except:
+            pass  # Continue even if collection deletion fails
+        
         # Remove the entire directory
-        shutil.rmtree(target_path)
+        shutil.rmtree(topic_path)
         
         return f"Successfully deleted topic: {topic}"
         
     except Exception as e:
         return f"Error deleting topic: {str(e)}"
 
+@mcp.tool()
+def get_topic_info(topic: str) -> str:
+    """
+    Get detailed information about a research topic.
+    Args:
+        topic: Topic name to get info for
+    """
+    try:
+        topic_path = CHROMA_DB_ROOT / topic
+        
+        if not topic_path.exists():
+            return f"Topic '{topic}' does not exist"
+        
+        # Get vectorstore info
+        vectorstore = get_vectorstore(topic)
+        collection = vectorstore._collection
+        doc_count = collection.count()
+        
+        # Get content hashes info
+        hashes = load_content_hashes(topic_path)
+        hash_count = len(hashes)
+        
+        info = f"""Topic Information: {topic}
+                - ChromaDB Collection: research_{topic}
+                - Document Count: {doc_count}
+                - Hash Records: {hash_count}
+                - Database Path: {topic_path}
+                - Embedding Model: {EMBED_MODEL}
+                - Ollama URL: {OLLAMA_BASE_URL}"""
+        
+        return info
+        
+    except Exception as e:
+        return f"Error getting topic info: {str(e)}"
+
 if __name__ == "__main__":
+    print("=" * 50)
+    print("Research Assistant MCP Server with ChromaDB")
+    print("=" * 50)
+    print(f"ChromaDB Root: {CHROMA_DB_ROOT}")
+    print(f"Embedding Model: {EMBED_MODEL}")
+    print(f"Ollama URL: {OLLAMA_BASE_URL}")
+    print("-" * 50)
+    print("Available Tools:")
+    print("  - save_research_data: Save content to topic")
+    print("  - search_research_data: Search within topic")
+    print("  - list_research_topics: List all topics")
+    print("  - delete_research_topic: Delete a topic")
+    print("  - get_topic_info: Get topic details")
+    print("=" * 50)
+    
     mcp.run(transport="stdio")

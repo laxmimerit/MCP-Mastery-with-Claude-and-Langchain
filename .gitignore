@@ -9,3 +9,8 @@ wheels/
 # Virtual environments
 .venv
 .env
+*.bin
+*.sqlite3
+*.pkl
+*.faiss
+*.db
