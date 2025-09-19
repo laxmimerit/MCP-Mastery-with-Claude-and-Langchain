@@ -23,15 +23,15 @@ TEMP_DIR.mkdir(parents=True, exist_ok=True)
 # === Load .env from parent directory ===
 # Load environment variables from a .env file located in the parent directory
 PARENT_DIR = BASE_DIR.parent
-dotenv_path = PARENT_DIR / ".env"
-load_dotenv(dotenv_path)
-
+load_dotenv()
 
 # === JSearch API Info ===
 # Get API credentials from environment variables
 RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")  # Your RapidAPI key
 RAPIDAPI_HOST = os.getenv("RAPIDAPI_HOST")  # JSearch API host
 
+# print(f"Using JSearch API Host: {RAPIDAPI_HOST}")
+# print(f"Using JSearch API Key: {RAPIDAPI_KEY}")
 
 # === Init MCP ===
 # Initialize the FastMCP server with a name
