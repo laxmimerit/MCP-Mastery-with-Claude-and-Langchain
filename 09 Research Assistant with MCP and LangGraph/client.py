@@ -13,6 +13,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
@@ -20,24 +21,15 @@ load_dotenv()
 FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_API_KEY")
 
 # Multi-server MCP client configuration
-client = MultiServerMCPClient({
-    "research_server": {
-        "command": "uv",
-        "args": ["--directory",
-                "D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\09 Research Assistant with MCP and LangGraph",
-                "run",
-                "server.py"],
-        "transport": "stdio",
-    },
-    "firecrawl_server": {
-        "command": "npx",
-        "args": ["-y", "firecrawl-mcp"],
-        "transport": "stdio",
-        "env": {
-            "FIRECRAWL_API_KEY": FIRECRAWL_API_KEY
-        }
-    }
-})
+current_dir = os.path.dirname(os.path.abspath(__file__))
+mcp_config_path = os.path.join(current_dir, "mcp.json")
+mcp_json = json.load(open(mcp_config_path, 'r'))
+mcp_json["firecrawl_server"]["env"] = {
+    "FIRECRAWL_API_KEY": FIRECRAWL_API_KEY
+}
+
+
+client = MultiServerMCPClient(mcp_json)
 
 async def create_research_agent():
     """Create a LangGraph agent with research and web crawling capabilities."""
