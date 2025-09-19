@@ -1,7 +1,4 @@
-# pip install -qU langchain-ollama
-# pip install langchain
-# pip install streamlit
-# pip install langchain-mcp-adapters langgraph
+# uv add streamlit langchain-mcp-adapters langgraph
 
 import streamlit as st
 import asyncio
@@ -12,11 +9,16 @@ from langchain_ollama import ChatOllama
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from langchain_mcp_adapters.tools import load_mcp_tools
-from langgraph.prebuilt import create_react_agent
 
+# use only when you are using langchain and langgraph v0.3
+from langgraph.prebuilt import create_react_agent as create_agent
+
+## use following agent if you are using langchain v1
+# from langchain.agents import create_agent
+
+# Make sure to update to the full absolute path to your server.py file
 server_params = StdioServerParameters(
     command="uv",
-    # Make sure to update to the full absolute path to your server.py file
     args=["--directory",
             "D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\08 MCP RAG with LangChain",
             "run",
@@ -48,7 +50,7 @@ async def generate_response_async(user_message):
             tools = await load_mcp_tools(session)
             
             # Create and run the agent
-            agent = create_react_agent(model, tools)
+            agent = create_agent(model, tools)
             agent_response = await agent.ainvoke({"messages": [{"role": "user", "content": user_message}]})
 
             if debug_info:
