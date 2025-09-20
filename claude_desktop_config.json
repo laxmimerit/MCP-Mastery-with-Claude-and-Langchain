@@ -98,6 +98,23 @@
 				"run",
 				"server.py"
 			]
+		},
+		"research_server": {
+			"command": "uv",
+			"args": [
+				"--directory",
+				"D:\\Courses\\Udemy\\MCP Mastery - Claude and LangChain\\09 Research Assistant with MCP and LangGraph",
+				"run",
+				"server.py"
+			]
+		},
+		"remote-research-server": {
+			"command": "npx",
+			"args": [
+				"mcp-remote",
+				"http://3.6.90.231:8000/mcp",
+				"--allow-http"
+			]
 		}
 	}
 }
